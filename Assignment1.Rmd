@@ -1,0 +1,310 @@
+---
+title: "STAT452 - Assignment One"
+author: "Marcus Buckland 300220541"
+date: "2024-03-03"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(pander)
+```
+
+## 1. 
+
+#### (a)(i)
+
+This prior distribution of $\theta$ represents a belief that the probability of success is at its highest when $\theta \approx 0.8$, as shown by a large proportion of the density of the curve (representing probability of "success") occurring when $\theta$ is close to a value of 0.8. 
+
+#### (a)(ii)
+
+This prior distribution of $\theta$ represents no belief at all about the probability of success depending on $\theta$, and is known as a non-informative prior. We can consider a non-informative prior for $\theta$ when we have little or no prior knowledge or belief. 
+
+
+#### (a)(iii)
+
+This prior distribution of $\theta$ is bi-modal, with two peaks as $\theta \approx 0$ and $\theta \approx 1.0$. This represents a belief that the probability of "success" for the binomial sampling model will be at it's highest when $\theta$ is close to zero or one, as the density is largest at the extremities.
+
+
+#### (b)
+
+\
+
+#### Prior distribution
+
+$$ \theta \sim Beta(4,12) $$
+
+
+#### Sampling model
+
+$$ Y| \theta \sim Bin(16,\theta) $$
+
+#### Posterior distribution
+
+$$ \theta|Y = y \sim Beta(\alpha + y, \  \beta+n-y) $$
+
+$$ \theta|Y = 12 \sim Beta(4+12, \ 12+16-12) $$
+
+
+$$ \sim Beta(16, 16) $$
+
+#### Posterior mode
+
+$$ Posterior \ Mode \ [\theta|Y] = \frac{16-1}{(16+16-2)}$$
+
+$$ = \frac{15}{30} $$
+
+$$ = 0.50 $$
+
+#### Maximum Likelihood estimator
+
+$$ \hat{\theta}_{ML} = \frac{y}{n}$$
+
+$$ = \frac{12}{16} $$
+$$ = 0.75 $$
+
+The posterior mode=0.50 is less than the value for the maximum likelihood estimator $\hat{\theta} = 0.75$. This result is expected, as the posterior distribution is informed not solely by the sampling model but also the prior distribution- and can be expressed as a weighted average of the sampling model and prior distribution.
+
+
+
+#### (c)
+
+\
+
+#### Posterior mean
+
+$$ \mathbb{E}[\theta|Y=y] = \frac{16}{16+16} = 0.50 $$
+
+
+#### Prior mean
+
+$$ \mathbb{E}[\theta] = \frac{4}{16} = 0.25 $$
+
+
+#### Maximum Likelihood estimator
+
+$$ \hat{\theta}_{ML} = \frac{12}{16} = 0.75$$
+
+The posterior mean of 0.50 is: \
+- larger than the prior mean of 0.25 \
+- smaller than the $\hat{\theta}_{ML}$ of 0.75
+
+#### Prior sample size
+
+$$\alpha + \beta = 4 + 12 = 16$$
+
+#### Actual sample size
+\
+
+$$ n = 16 $$
+
+#### Beta posterior
+
+$$ \mathbb{E}[\theta|y] = (\frac{w}{w+n})\theta_{0} + (\frac{n}{w+n})\hat{\theta}_{ML} $$
+Because $n=w$, we have $$\mathbb{E}[\theta|y] = (0.5 \times 0.25) + (0.5 \times 0.75) = 0.50 $$
+
+As the prior sample size was the same as the actual sample size for the Binomial sampling model, it is not surprising that the posterior mean is the mean of both the prior mean and the maximum likelihood estimate.
+
+#### (d)
+
+\
+
+```{r}
+
+# Code shamelessly taken from Week 1 course notes
+d = data.frame(
+  theta = seq(0, 1, by = 0.001),
+  distribution = rep(c("prior: Beta(4,12)", "posterior: Beta(16,16)", "likelihood"), each = 1001),
+  density = c(dbeta(seq(0, 1, by = 0.001), 4, 12), dbeta(seq(0, 1, by = 0.001), 16, 16), dbeta(seq(0, 1, by = 0.001), 13, 5))
+)
+ggplot(d, aes(x = theta, y = density, color = distribution)) +
+  geom_line()
+
+```
+
+The prior distribution has shifted towards the likelihood distribution. This is not surprising, as we are in effect updating our beliefs about $\theta|Y=y$. We can think about the distribution of the likelihood "dragging" the prior towards it. The data that were observed had 12 "successes" in a sample size of 16, corresponding to a mean of 0.75. It is no surprise then that our posterior mean of 0.5 is larger than the prior mean of 0.25.
+
+
+\newpage
+
+## 2.
+
+#### (a)
+
+\
+
+#### (b)
+
+$$ Prior \ sample \ size = a - 1 = 11 $$
+
+$$ a = 12 $$
+
+$$\mathbb{E}(\theta) = \frac{a}{b} = \frac{12}{b} = 2 $$
+$$ b = 6 $$
+
+
+
+The $Gamma(12,6)$ distribution can be used to represent prior beliefs where the prior mean is 2 and the prior sample size is 11.
+
+
+#### (c)
+
+#### Prior mean
+
+\
+
+$$ \mathbb{E}(\theta) = \frac{12}{6} = 2 $$
+
+#### Prior mode
+
+\
+
+$$ mode(\theta) = \frac{12-1}{6} \approx 1.8333 $$
+
+#### Prior variance
+
+\
+
+$$ \mathbb{V}(\theta) = \frac{12}{6^2} = \frac{1}{3} $$
+
+#### Posterior Distrbution
+
+\
+
+$$\theta | y_1,y_2,...,y_{22} \sim Gamma(12+22, 6+44) $$
+$$ \sim Gamma(34, 50)$$
+
+#### Posterior mean
+
+\
+
+$$ \mathbb{E}(\theta) = \frac{34}{50} = 0.68 $$
+
+#### Prior mode
+
+\
+
+$$ mode(\theta) = \frac{34-1}{50} = 0.66 $$
+
+#### Prior variance
+
+\
+
+$$ \mathbb{V}(\theta) = \frac{34}{50^2} = 0.0136 $$
+
+```{r}
+prior.mean <- 12/6
+prior.mode <- (12-1)/6
+prior.var <- 11/6^2
+posterior.mean <- 34/50
+posterior.mode <- (34-1)/50
+posterior.variance <- 34/50^2
+
+d <- matrix(data=c(prior.mean, prior.mode, prior.var,
+              posterior.mean, posterior.mode, posterior.variance),
+       nrow=3, ncol=2)
+
+d <- data.frame(data=d, row.names = c("Mean", "Mode", "Variance"))
+names(d)[1] <- "Prior"
+names(d)[2] <- "Posterior"
+
+d |> pander()
+
+```
+
+
+\
+
+#### (d)
+
+\
+
+#### (e)
+
+\
+
+
+
+\newpage
+
+## 3.
+
+#### (a)
+
+```{r}
+
+data <- matrix(
+  c(0.1053, 0.1582, 0.0112, 0.0159, 0.0035,
+    0.1765, 0.1353, 0.0224, 0.0135, 0.0053,
+    0.1482, 0.1700, 0.0171, 0.0159, 0.0017),
+    nrow=3, ncol=5,
+  byrow=TRUE)
+
+degree <- c("BA", "BSc", "MA", "MSc", "PhD")
+cohort <- c("Cohort 1", "Cohort 2", "Cohort 3")
+
+joint.dist <- matrix(data=data, nrow=3, dimnames=list(cohort, degree))
+
+# Pr(Y2=yi)
+sum(joint.dist[1,]) # Cohort 1
+sum(joint.dist[2,]) # Cohort 2
+sum(joint.dist[3,]) # Cohort 3
+
+```
+$$ P(Y_2=Cohort \ 1) = \sum_{i=1}^nP(Y_1=y_i, Y_2=Cohort \ 1) = 0.2941 $$
+$$ P(Y_2=Cohort \ 2) = \sum_{i=1}^nP(Y_1=y_i, Y_2=Cohort \ 2) = 0.353 $$
+
+$$ P(Y_2=Cohort \ 3) = \sum_{i=1}^nP(Y_1=y_i, Y_2=Cohort \ 3) =  0.3529 $$
+
+
+#### (b)
+
+```{r}
+
+# Pr(Y1=yi | Y2=cohort 3)
+round(joint.dist[3,1] / sum(joint.dist[3,]),4) # BA
+round(joint.dist[3,2] / sum(joint.dist[3,]),4) # BSc
+round(joint.dist[3,3] / sum(joint.dist[3,]),4) # MA
+round(joint.dist[3,4] / sum(joint.dist[3,]),4) # MSc
+round(joint.dist[3,5] / sum(joint.dist[3,]),4) # PhD
+
+```
+
+$$ P(Y_1=BA \ | \ Y_2=Cohort \ 3) = \frac{P(Y_1=BA, Y_2=Cohort \ 3)}{P(Y_2=Cohort \ 3)} = \frac{0.1482}{0.3529} = 0.4199 $$
+
+$$ P(Y_1=BSc \ | \ Y_2=Cohort \ 3) = \frac{P(Y_1=BSc, Y_2=Cohort \ 3)}{P(Y_2=Cohort \ 3)} = \frac{0.1700}{0.3529} = 0.4817 $$
+
+$$ P(Y_1=MA \ | \ Y_2=Cohort \ 3) = \frac{P(Y_1=MA, Y_2=Cohort \ 3)}{P(Y_2=Cohort \ 3)} = \frac{0.0171}{0.3529} = 0.0485 $$
+
+$$ P(Y_1=MSc \ | \ Y_2=Cohort \ 3) = \frac{P(Y_1=MSc, Y_2=Cohort \ 3)}{P(Y_2=Cohort \ 3)} = \frac{0.0159}{0.3529} = 0.0451 $$
+
+$$ P(Y_1=PhD \ | \ Y_2=Cohort \ 3) = \frac{P(Y_1=PhD, Y_2=Cohort \ 3)}{P(Y_2=Cohort \ 3)} = \frac{0.0017}{0.3529} = 0.0048 $$
+
+
+#### (c)
+
+```{r}
+
+# Pr(Y2=yi | Y1=MSc)
+round(joint.dist[1,4] / sum(joint.dist[,4]),4) # Cohort 1
+round(joint.dist[2,4] / sum(joint.dist[,4]),4) # Cohort 2
+round(joint.dist[3,4] / sum(joint.dist[,4]),4) # Cohort 3
+
+```
+
+
+$$ P(Y_2=Cohort \ 1 \ | \ Y_1=MSc) = \frac{P(Y_1=MSc, Y_2=Cohort \ 1)}{P(Y_1=MSc)} = \frac{0.0159}{0.0453} =  0.351 $$
+
+$$ P(Y_2=Cohort \ 2 \ | \ Y_1=MSc) = \frac{P(Y_1=MSc, Y_2=Cohort \ 2)}{P(Y_1=MSc)} = \frac{0.0135}{0.0453} =  0.298 $$
+
+$$ P(Y_2=Cohort \ 3 \ | \ Y_1=MSc) = \frac{P(Y_1=MSc, Y_2=Cohort \ 3)}{P(Y_1=MSc)} = \frac{0.0017}{0.0453} =  0.351 $$
+
+
+\newpage
+
+## 4.
+
+#### (a)
+
+
